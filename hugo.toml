@@ -1,0 +1,28 @@
+baseURL = "https://papnori.github.io/"
+languageCode = "en-us"
+title = "Nora Pap"
+theme = "PaperMod"
+
+[params]
+
+  author = "Nora Pap"
+  description = "AI Engineer • Co-founder of Skinsight"
+  defaultTheme = "auto"
+  ShowReadingTime = true
+  ShowShareButtons = false
+  ShowPostNavLinks = true
+  ShowBreadCrumbs = true
+  ShowCodeCopyButtons = true
+  homeSections = ["posts"]
+
+  socialStyle = "rounded"
+  socialColor = true
+
+[params.assets]
+  favicon16x16 = "/assets/favicon-16x16.png"
+  favicon32x32 = "/assets/favicon-32x32.png"
+  apple_touch_icon = "/assets/apple-touch-icon.png"
+
+favicon = "favicon.ico"
+
+
