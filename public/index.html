@@ -1,8 +1,31 @@
 <!DOCTYPE html>
 <html lang="en" dir="auto">
 
+<script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    
+    document.querySelectorAll('pre code.language-mermaid, pre code.mermaid').forEach(code => {
+      const parent = code.parentNode;
+      const container = document.createElement('div');
+      container.classList.add('mermaid');
+      container.textContent = code.textContent;
+      parent.parentNode.replaceChild(container, parent);
+    });
+
+    
+    if (window.mermaid) {
+      mermaid.initialize({ startOnLoad: true, theme: 'default' });
+      
+      mermaid.init(undefined, document.querySelectorAll('.mermaid'));
+    } else {
+      console.error('mermaid not loaded');
+    }
+  });
+</script>
+
 <head>
-	<meta name="generator" content="Hugo 0.151.0"><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
+	<meta name="generator" content="Hugo 0.151.0"><meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <meta name="robots" content="noindex, nofollow">
@@ -123,8 +146,7 @@
     </h2>
   </header>
   <div class="entry-content">
-    <p> Skip the Kubernetes overhead—this guide shows how to run Temporal workers on ECS with Fargate, cutting costs while keeping your setup resilient and production-ready. 💪
-...</p>
+    <p>Skip the Kubernetes overhead—this guide shows how to run Temporal workers on ECS with Fargate, cutting costs while keeping your setup resilient and production-ready. 💪</p>
   </div>
   <footer class="entry-footer"><span title='2025-10-07 00:00:00 +0000 UTC'>October 7, 2025</span>&nbsp;·&nbsp;<span>37 min</span>&nbsp;·&nbsp;<span>Nora Pap</span></footer>
   <a class="entry-link" aria-label="post link to Deploying Temporal on AWS ECS with Terraform" href="http://localhost:1313/posts/temporal-ecs-terraform/"></a>
@@ -199,7 +221,6 @@
         }
     })
 
-</script>
-</body>
+</script></body>
 
 </html>

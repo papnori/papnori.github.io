@@ -1,7 +1,30 @@
 <!DOCTYPE html>
 <html lang="en" dir="auto">
 
-<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
+<script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    
+    document.querySelectorAll('pre code.language-mermaid, pre code.mermaid').forEach(code => {
+      const parent = code.parentNode;
+      const container = document.createElement('div');
+      container.classList.add('mermaid');
+      container.textContent = code.textContent;
+      parent.parentNode.replaceChild(container, parent);
+    });
+
+    
+    if (window.mermaid) {
+      mermaid.initialize({ startOnLoad: true, theme: 'default' });
+      
+      mermaid.init(undefined, document.querySelectorAll('.mermaid'));
+    } else {
+      console.error('mermaid not loaded');
+    }
+  });
+</script>
+
+<head><meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <meta name="robots" content="noindex, nofollow">
@@ -179,7 +202,6 @@
         }
     })
 
-</script>
-</body>
+</script></body>
 
 </html>
