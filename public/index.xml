@@ -13,7 +13,7 @@
       <link>http://localhost:1313/posts/temporal-ecs-terraform/</link>
       <pubDate>Tue, 07 Oct 2025 00:00:00 +0000</pubDate>
       <guid>http://localhost:1313/posts/temporal-ecs-terraform/</guid>
-      <description>Skip the Kubernetes overhead—this guide shows how to run Temporal workers on ECS with Fargate, cutting costs while keeping your setup resilient and production-ready. 💪 </description>
+      <description>Skip the Kubernetes overhead—this guide shows how to run Temporal workers on ECS with Fargate, cutting costs while keeping your setup resilient and production-ready. 💪</description>
     </item>
   </channel>
 </rss>
