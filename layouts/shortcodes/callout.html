@@ -1,0 +1,45 @@
+{{ $type := .Get "type" | default "note" }}
+{{ $title := .Get "title" | default (title $type) }}
+
+{{ $icon := "" }}
+{{ $color := "" }}
+{{ if eq $type "note" }}{{ $icon = "💡" }}{{ $color = "#0366d6" }}{{ end }}
+{{ if eq $type "tip" }}{{ $icon = "💡" }}{{ $color = "#1a7f37" }}{{ end }}
+{{ if eq $type "warning" }}{{ $icon = "⚠️" }}{{ $color = "#bf8700" }}{{ end }}
+{{ if eq $type "danger" }}{{ $icon = "❌" }}{{ $color = "#cf222e" }}{{ end }}
+{{ if eq $type "important" }}{{ $icon = "❗" }}{{ $color = "#cf222e" }}{{ end }}
+
+<div class="callout {{ $type }}">
+  {{ if $title }}
+    <p class="callout-title" style="color: {{ $color }}">{{ $icon }} {{ $title }}</p>
+  {{ end }}
+  {{ .Inner | markdownify }}
+</div>
+
+<style>
+.callout {
+  padding: 0.8em 1em;
+  border-left: 0.25em solid;
+  border-radius: 6px;
+  margin: 1em 0;
+  background-color: transparent;
+}
+
+.callout-title {
+  font-weight: 700;      /* bold */
+  font-size: 1rem;       /* normal size */
+  margin-bottom: 0.5em;
+}
+
+.callout p, .callout li {
+  font-weight: normal;
+  font-size: 1rem;
+}
+
+/* Type-specific border colors */
+.callout.note { border-color: #0366d6; }
+.callout.tip { border-color: #1a7f37; }
+.callout.warning { border-color: #bf8700; }
+.callout.danger { border-color: #cf222e; }
+.callout.important { border-color: #cf222e; }
+</style>

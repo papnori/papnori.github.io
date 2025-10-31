@@ -4,7 +4,6 @@ date: 2025-10-07
 draft: false
 ---
 
-# Deploying Temporal on AWS ECS with Terraform
 ## 👋  Introduction
 Most of Temporal’s official [deployment guides](https://docs.temporal.io/production-deployment/worker-deployments/deploy-workers-to-aws-eks) focus on Kubernetes. While Kubernetes is powerful and battle-tested for large-scale workloads, it also comes with significant overhead — **both financially** (AWS EKS clusters aren’t cheap 💸) and **operationally** (node upgrades, cluster maintenance, networking complexity).
 
@@ -12,18 +11,19 @@ For many teams, especially when just getting started, that’s more than you act
 
 This guide walks through deploying Temporal workers on AWS ECS with Terraform. Using ECS (especially with Fargate) can **reduce infrastructure costs by ~70%** while still **providing elasticity, resilience, and production-ready reliability**. 💪 
 
-> [!NOTE]  
->
-> Amazon Elastic Container Service (ECS) is a fully managed service for running Docker containers on AWS. 
->
-> It allows you to deploy, manage, and scale containerized applications without manually handling servers or complex orchestrations.
->
-> ECS gives you two ways to run containers:
->
-> - **ECS on EC2** — you manage the EC2 instances that run your containers.
-> - **ECS on Fargate** (The focus of this blog) — AWS manages the infrastructure; you just define your containers and how many to run. This gives you a completely serverless architecture.
->
-> ECS handles container scheduling, load balancing, scaling, and networking — so you can focus on your application, not the plumbing.
+
+{{< callout type="note" title="Note" >}}
+Amazon Elastic Container Service (ECS) is a fully managed service for running Docker containers on AWS.
+
+It allows you to deploy, manage, and scale containerized applications without manually handling servers or complex orchestrations.
+
+ECS gives you two ways to run containers:
+
+- **ECS on EC2** — you manage the EC2 instances that run your containers.
+- **ECS on Fargate** (The focus of this blog) — AWS manages the infrastructure; you just define your containers and how many to run. This gives you a completely serverless architecture.
+
+ECS handles container scheduling, load balancing, scaling, and networking — so you can focus on your application, not the plumbing.
+{{< /callout >}}
 
 ---
 
@@ -57,29 +57,29 @@ You’re running **Temporal Cloud** or **Self-hosting Temporal Server** as the o
 Additionally, the Terraform state is safely stored in **S3**, so multiple developers or CI/CD pipelines can collaborate without fear of stepping-on each others changes. 
 
 ![Architecture Diagram](/images/temporal-ecs-terraform/architecture.svg "'Architecture Diagram'")
+
 ---
 
 
-> [!NOTE]
->
-> In this blog, we’re focusing on how to connect Temporal Workers running in **AWS private subnets** to **external orchestration endpoints** — either **Temporal Cloud** or a **self-hosted Temporal Server** running locally (via Ngrok).
->
-> This design intentionally demonstrates how workers inside a VPC can securely reach **internet-accessible resources** while remaining isolated from inbound traffic.
->
-> In a production environment, you could alternatively **host Temporal Server inside your AWS VPC** — allowing internal-only communication between workers and the server.
->
-> We’ve omitted that configuration here for simplicity, since the focus is on showing how private Fargate tasks of Temporal workers connect outward safely and reliably.
+{{< callout type="note" title="Note" >}}
+In this blog, we’re focusing on how to connect Temporal Workers running in **AWS private subnets** to **external orchestration endpoints** — either **Temporal Cloud** or a **self-hosted Temporal Server** running locally (via Ngrok).
 
+ his design intentionally demonstrates how workers inside a VPC can securely reach **internet-accessible resources** while remaining isolated from inbound traffic.
+
+In a production environment, you could alternatively **host Temporal Server inside your AWS VPC** — allowing internal-only communication between workers and the server.
+
+We’ve omitted that configuration here for simplicity, since the focus is on showing how private Fargate tasks of Temporal workers connect outward safely and reliably.
+{{< /callout >}}
 
 
 ## 🏗️ Architecture Components
 
-> [!TIP]
->
-> This section breaks down the core AWS architecture components we'll be using — perfect if you’re new to the cloud or need a refresher. 🍹
->
-> If you already know your way around VPCs, subnets, and gateways etc. feel free to skip ahead. 
+{{< callout type="tip" title="Tip" >}}
+This section breaks down the core AWS architecture components we'll be using — perfect if you’re new to the cloud or need a refresher. 🍹
 
+If you already know your way around VPCs, subnets, and gateways etc. feel free to skip ahead. 
+{{< /callout >}}
+> 
 #### 🦴 Virtual Private Cloud (VPC) - The Skeleton of Your AWS Neighborhood
 A logically isolated virtual network in AWS where you define your own IP ranges, subnets, and routing.
 
@@ -100,13 +100,14 @@ Subnets can be:
 - **Private** → A private street doesn’t connect to the highway. 🚧 
   To access external resources, cars must first pass through a special **toll booth (NAT Gateway)** or utilize **secret tunnels (VPC endpoints)** to reach specific AWS services. 🛣️✨
 
-> [!TIP]
->
-> **Why bother with private subnets?**
->
-> - Private subnets limit exposure of your temporal workers to the internet.
-> - Ensures all outbound traffic goes through the Internet Gateway for control and monitoring.
-> - Follows AWS best practices for ECS + Fargate workloads that consume external services.
+{{< callout type="note" title="Note" >}}
+
+**Why bother with private subnets?**
+
+- Private subnets limit exposure of your temporal workers to the internet.
+- Ensures all outbound traffic goes through the Internet Gateway for control and monitoring.
+- Follows AWS best practices for ECS + Fargate workloads that consume external services.
+{{< /callout >}}
 
 #### 🚇 VPC Endpoints — The Secret Tunnels
 
@@ -250,10 +251,10 @@ sequenceDiagram
 - **Resilient**: Workflows survive worker crashes. 
   Temporal guarantees retries & state persistence, which is super useful, as we use mainly Spot instances. 
 
-  > [!NOTE]
-  >
-  > Spot instances are *ephemeral and can be terminated* with a 2-minute warning. If the worker simply "dies", the task will fail with a `TimeOutError`, and Temporal will reschedule the task to be executed by another worker.
-  
+  {{< callout type="note" title="Note" >}}
+  Spot instances are *ephemeral and can be terminated* with a 2-minute warning. If the worker simply "dies", the task will fail with a `TimeOutError`, and Temporal will reschedule the task to be executed by another worker.
+  {{< /callout >}}
+
 - **Secure**: Workers live in private subnets, and secrets are injected securely at runtime - never hardcoded.
 
 - **Cost-efficient**: Fargate Spot + Auto-scaling means you only pay for what you use.
@@ -290,9 +291,9 @@ First, you’ll need to store your Temporal Cloud or a Self-hosted Temporal Serv
 
 These secrets allow your workers to authenticate and connect to Temporal without exposing credentials in your codebase.
 
-> [!CAUTION]
->
->  *Never commit secrets to version control!*
+{{< callout type="warning" title="Warning" >}}
+*Never commit secrets to version control!*
+{{< /callout >}}
 
 Create a new secret (for example, `dev/sample-config`) in the `us-east-1` region **— the same region where your ECS cluster will run** — with the following key–value pairs:
 
@@ -304,11 +305,11 @@ Create a new secret (for example, `dev/sample-config`) in the `us-east-1` region
   "TEMPORAL_API_KEY": "ey..." // Not needed if self-hosting locally
 }
 ```
-> [!NOTE]
->
-> Replace the values above with the ones from your Temporal Cloud account. The API key should come from the Temporal Cloud console.
->
-> If you’re running a **self-hosted Temporal Server locally**, replace `TEMPORAL_SERVER_ENDPOINT` with your **Ngrok URL**, and omit `TEMPORAL_API_KEY` , it’s only needed for Temporal Cloud.
+{{< callout type="note" title="Note" >}}
+Replace the values above with the ones from your Temporal Cloud account. The API key should come from the Temporal Cloud console.
+
+If you’re running a **self-hosted Temporal Server locally**, replace `TEMPORAL_SERVER_ENDPOINT` with your **Ngrok URL**, and omit `TEMPORAL_API_KEY` , it’s only needed for Temporal Cloud.
+{{< /callout >}}
 
 You can skip configuring rotation on AWS Secrets Manager for this demo.
 
@@ -322,11 +323,11 @@ You can skip configuring rotation on AWS Secrets Manager for this demo.
 
 ### 2. 🦄 Terraform Infrastructure Setup 
 
-> [!IMPORTANT]
->
-> This section assumes you have a basic understanding of Terraform — how it works, and how a Terraform project is typically structured.
->
-> The layout we’ll use here is a **hybrid** of the [official HashiCorp repository structure](https://developer.hashicorp.com/terraform/language/style#repository-structure) and the approach outlined in Yevgeniy Brikman’s excellent book, [*Terraform: Up & Running*](https://www.terraformupandrunning.com/).
+{{< callout type="important" title="Important" >}}
+This section assumes you have a basic understanding of Terraform — how it works, and how a Terraform project is typically structured.
+
+The layout we’ll use here is a **hybrid** of the [official HashiCorp repository structure](https://developer.hashicorp.com/terraform/language/style#repository-structure) and the approach outlined in Yevgeniy Brikman’s excellent book, [*Terraform: Up & Running*](https://www.terraformupandrunning.com/).
+{{< /callout >}}
 
 We’ll use **four main folders** in our Terraform repository:
 
@@ -337,29 +338,29 @@ We’ll use **four main folders** in our Terraform repository:
 
 - `terraform/modules/` - reusable building blocks such networking, ECS cluster and service definitions that are referenced by the live environment configurations.
 
-> [!NOTE]
->
-> If you’re new to Terraform, you might wonder: *why do we need a separate setup just for the state files?*
->
-> When you run Terraform, it generates a **state file** — basically a snapshot of everything Terraform has created and manages. That state file has to live somewhere safe. 
->
-> Storing it only on your laptop is risky (imagine spilling coffee on it and suddenly losing all records of your infrastructure :upside_down_face: — not exactly the ideal way to setup your new startup ☕💻🔥).
->
-> That’s why we store it in **Amazon S3** as a remote backend: durable, centralized, and accessible to your whole team.
->
-> But here’s the catch: Terraform needs an S3 bucket to store state, but the bucket doesn’t exist until Terraform makes it — this is what’s often called IaC's **classic chicken-and-egg problem**. 🐥🥚
->
-> So the solution is to **bootstrap**:
->
-> 1) Run a small, one-time Terraform setup that creates the S3 bucket and state locking.
->
-> 2) Update your main Terraform project to use that remote S3 backend for storing state.
->
-> This way, the chicken (Terraform) has a safe place to lay its egg (the state file). 🐣🥚
->
-> An additional benefit: because Terraform state is stored in plain-text by default and may include secrets or config values, placing it in an encrypted S3 bucket (with proper access control) helps keep those values safe.
->
-> Ready? Let's do it! 🏁
+{{< callout type="note" title="Note" >}}
+If you’re new to Terraform, you might wonder: *why do we need a separate setup just for the state files?*
+
+When you run Terraform, it generates a **state file** — basically a snapshot of everything Terraform has created and manages. That state file has to live somewhere safe. 
+
+Storing it only on your laptop is risky (imagine spilling coffee on it and suddenly losing all records of your infrastructure :upside_down_face: — not exactly the ideal way to setup your new startup ☕💻🔥).
+
+That’s why we store it in **Amazon S3** as a remote backend: durable, centralized, and accessible to your whole team.
+
+But here’s the catch: Terraform needs an S3 bucket to store state, but the bucket doesn’t exist until Terraform makes it — this is what’s often called IaC's **classic chicken-and-egg problem**. 🐥🥚
+
+So the solution is to **bootstrap**:
+
+1) Run a small, one-time Terraform setup that creates the S3 bucket and state locking.
+
+2) Update your main Terraform project to use that remote S3 backend for storing state.
+
+This way, the chicken (Terraform) has a safe place to lay its egg (the state file). 🐣🥚
+
+An additional benefit: because Terraform state is stored in plain-text by default and may include secrets or config values, placing it in an encrypted S3 bucket (with proper access control) helps keep those values safe.
+
+Ready? Let's do it! 🏁
+{{< /callout >}}
 
 #### i. 👯‍♂️ Clone the Repository
 
@@ -386,12 +387,12 @@ Next, we’ll create the **S3 bucket** that will hold the remote Terraform state
 
    
 
-   > [!Note]
-   >
-   > This code block responsible for using the state file from S3 bucket.
-   >
-   > While commented out, Terraform fallsback to using a local state, as the S3 bucket does not exist yet.
-
+   {{< callout type="note" title="Note" >}}
+   This code block responsible for using the state file from S3 bucket.
+   
+   While commented out, Terraform fallsback to using a local state, as the S3 bucket does not exist yet.
+   {{< /callout >}}
+   
    It should look like this:
 
    ```hcl
@@ -404,14 +405,14 @@ Next, we’ll create the **S3 bucket** that will hold the remote Terraform state
    #   }
    ```
    
-   > [!WARNING]
-   >
-   > Change the bucket name in `terraform/bootstrap/main.tf` (line 2 in the file) and `terraform/bootstrap/providers.tf` (line 9) to your *own*, *unique bucket name*.
+   {{< callout type="warning" title="Warning" >}}
+   Change the bucket name in `terraform/bootstrap/main.tf` (line 2 in the file) and `terraform/bootstrap/providers.tf` (line 9) to your *own*, *unique bucket name*.
+   {{< /callout >}}
    
-   > [!CAUTION]
-   >
-   > <u>**Important**:</u> **S3 bucket names need to be *globally unique*** i.e. your bucket name should be unique across all AWS accounts and regions. You need to change the bucket name above to be compliant of this requirement otherwise bucket creation will fail. 
-   
+    {{< callout type="important" title="Important" >}}
+   **S3 bucket names need to be *globally unique*** i.e. your bucket name should be unique across all AWS accounts and regions. You need to change the bucket name above to be compliant of this requirement otherwise bucket creation will fail. 
+   {{< /callout >}}
+
 3. **Initialize** the Terraform backend and download the AWS Provider:
 
    ```bash
@@ -561,9 +562,9 @@ No more local coffee hazards — your infrastructure state is *centralized, vers
 
 #### iv. 🚢 Create ECR Repository 
 
-> [!CAUTION]
->
-> Before you run anything below make sure to replace the S3 remote backend bucket name in `terraform/global/ecr/providers.tf` (line 5) to the one you created above.
+{{< callout type="warning" title="Warning" >}}
+Before you run anything below make sure to replace the S3 remote backend bucket name in `terraform/global/ecr/providers.tf` (line 5) to the one you created above.
+{{< /callout >}}
 
 With our remote backend ready, the next step is to set up a **container registry** where we can store and version Docker images. This is where your **Temporal Worker** image will live — built either manually or automatically later via GitHub Actions. 🤖
 
@@ -642,31 +643,32 @@ State file for managing ECR repository is in S3:
 
 You can now push images to this registry manually, and later let your GitHub Actions workflow (`build-and-publish-ecr-dev.yaml`) handle it automatically whenever you push new code. 🤖
 
-> [!NOTE]
->
-> This setup bridges the gap between **manual provisioning** and **automated pipelines** — Terraform creates the infrastructure once, and CI/CD keeps it up to date.
+{{< callout type="note" title="Note" >}}
+This setup bridges the gap between **manual provisioning** and **automated pipelines** — Terraform creates the infrastructure once, and CI/CD keeps it up to date.
+{{< /callout >}}
 
 #### v. 🫸 Pushing a Container to ECR 
 
 Before deploying our Temporal Worker, we need its Docker image available in a registry that ECS can pull from. In this step, we’ll **build, tag, authenticate, and push** our Temporal Worker image into **Amazon Elastic Container Registry (ECR)**.
 
-> [!NOTE]
-> The ECR repository URL was output by Terraform in the previous step.
->
-> ```bash
-> temporal_worker_dev_repository_url = "xxxxxxxxxxxx.dkr.ecr.us-east-1.amazonaws.com/temporal-worker-dev"
-> ```
+{{< callout type="note" title="Note" >}}
+The ECR repository URL was output by Terraform in the previous step.
+
+```bash
+temporal_worker_dev_repository_url = "xxxxxxxxxxxx.dkr.ecr.us-east-1.amazonaws.com/temporal-worker-dev"
+```
+{{< /callout >}}
 
 For reference, here’s the official AWS guide on this process: [AWS Documentation — Push a Docker Image to Amazon ECR](https://docs.aws.amazon.com/AmazonECR/latest/userguide/docker-push-ecr-image.html)
 
 You can adapt these commands for your own **AWS account ID**, **region**, or **repository name**.
 (Replace `<AWS_ACCOUNT_ID>` and `<REGION>` with your actual values — for region we've been using `us-east-1`.)
 
-> [!TIP]
->
-> Heads up! You can copy all the commands for steps 2 and beyond, below, from the `Push Commands` in AWS Console:
->
-> ![Push Commands](/images/temporal-ecs-terraform/push_commands.png)
+{{< callout type="tip" title="Tip" >}}
+Heads up! You can copy all the commands for steps 2 and beyond, below, from the `Push Commands` in AWS Console:
+
+![Push Commands](/images/temporal-ecs-terraform/push_commands.png)
+{{< /callout >}}
 
 1. **Navigate to your project root**.
 
@@ -682,14 +684,13 @@ You can adapt these commands for your own **AWS account ID**, **region**, or **r
 
    This builds a local image named `temporal-worker-dev:latest`, where `temporal-worker-dev` is the name of them Docker image and `latest` is the tag.
 
-   > [!TIP]
-   >
-   > In case you are building the image on an ARM machine like M-series Mac, use the following command to build for AMD64 platform:
-   >
-   > ```
-   > docker buildx build --platform linux/amd64 -t temporal-worker-dev .
-   > ```
-   >
+   {{< callout type="tip" title="Tip" >}}
+   In case you are building the image on an ARM machine like M-series Mac, use the following command to build for AMD64 platform:
+   
+   ```
+   docker buildx build --platform linux/amd64 -t temporal-worker-dev .
+   ```
+   {{< /callout >}}
 
 3. **Authenticate Docker with your ECR registry**.
 
@@ -755,37 +756,37 @@ Once complete, you’ll see your image listed under the *Images* tab of your ECR
 - **Pushed** it to ECR, uploading all layers.
 - ECS will later **pull** this image automatically when deploying your Fargate tasks.
 
-> [!TIP]
->
-> **Optional Best Practices**
->
-> - Use **versioned tags** (e.g. `:v1.0.0`, `:commit-sha`) instead of `:latest` in production to ensure reproducible deployments. 
->   For this demo, the current `:latest` tag will suffice.
-> - If your build process runs in CI/CD, these steps will be automated — GitHub Actions will handle authentication, tagging, and pushing for each new commit.
-> - Confirm that your IAM user or role includes ECR permissions:
->    `ecr:GetAuthorizationToken`, `ecr:BatchCheckLayerAvailability`, `ecr:PutImage`, and `ecr:InitiateLayerUpload`.
+{{< callout type="tip" title="Tip" >}}
+**Optional Best Practices**
+
+- Use **versioned tags** (e.g. `:v1.0.0`, `:commit-sha`) instead of `:latest` in production to ensure reproducible deployments. 
+  For this demo, the current `:latest` tag will suffice.
+- If your build process runs in CI/CD, these steps will be automated — GitHub Actions will handle authentication, tagging, and pushing for each new commit.
+- Confirm that your IAM user or role includes ECR permissions:
+   `ecr:GetAuthorizationToken`, `ecr:BatchCheckLayerAvailability`, `ecr:PutImage`, and `ecr:InitiateLayerUpload`.
+{{< /callout >}}
 
 ---
 
 #### vi. 🌍 Main Terraform setup 
 
-> [!CAUTION]
->
-> Before you run anything below make sure to:
->
-> 1. Replace the S3 remote backend bucket name in `terraform/live/dev/providers.tf` (line 5) to the one you created above.
->
-> 2. Uncomment and replace the variable `worker_container_image`  in `terraform/live/dev/terraform.tfvars` (line 29) to the ECR image URI you pushed, above. It should look something like this:
->
->    ```hcl
->    worker_container_image = "012345678912.dkr.ecr.us-east-1.amazonaws.com/temporal-worker-dev:latest"
->    ```
->
->    🤫 Copy URI from your ECR repository in the AWS Console:
->
->    ![Copy URI from ECR](/images/temporal-ecs-terraform/copy_uri.png)
->
-> 3. Uncomment and replace the variable `s3_data_bucket_name`  in `terraform/live/dev/terraform.tfvars` (line 37) to your desired globally unique AWS S3 bucket name for storing your business logic (in our demo, saving messages).
+{{< callout type="warning" title="Warning" >}}
+Before you run anything below make sure to:
+
+1. Replace the S3 remote backend bucket name in `terraform/live/dev/providers.tf` (line 5) to the one you created above.
+
+2. Uncomment and replace the variable `worker_container_image`  in `terraform/live/dev/terraform.tfvars` (line 29) to the ECR image URI you pushed, above. It should look something like this:
+
+   ```hcl
+   worker_container_image = "012345678912.dkr.ecr.us-east-1.amazonaws.com/temporal-worker-dev:latest"
+   ```
+
+   🤫 Copy URI from your ECR repository in the AWS Console:
+
+   ![Copy URI from ECR](/images/temporal-ecs-terraform/copy_uri.png)
+
+3. Uncomment and replace the variable `s3_data_bucket_name`  in `terraform/live/dev/terraform.tfvars` (line 37) to your desired globally unique AWS S3 bucket name for storing your business logic (in our demo, saving messages).
+{{< /callout >}}
 
 Now that the container registry, secrets, and remote state backend are ready, this is where everything comes together.
 
@@ -974,13 +975,13 @@ git remote rename origin upstream
 git remote add origin git@github.com:<your-username>/temporal-ecs-terraform.git
 git push -u origin main
 ```
-> [!TIP]
->
-> Using your own repo allows GitHub Actions workflows to run with your secrets and makes it easier to customize the setup for your team or environment.
+{{< callout type="tip" title="Tip" >}}
+Using your own repo allows GitHub Actions workflows to run with your secrets and makes it easier to customize the setup for your team or environment.
+{{< /callout >}}
 
-> [!IMPORTANT]
->
-> At this point all the GitHub actions will fail, and its alright we'll fix them in the next steps.
+{{< callout type="important" title="Important" >}}
+At this point all the GitHub actions will fail, and its alright we'll fix them in the next steps.
+{{< /callout >}}
 
 ---
 
@@ -1011,12 +1012,10 @@ Let’s configure this in AWS so your CI/CD can deploy infrastructure and push D
    - GitHub org/repo: `<your-org>/<your-repo>` (e.g., `papnori/temporal-ecs-terraform`)
      
 
-     > [!NOTE]
-     >
-     > No need to add permissions in the first setup.
-     > 
-     >
-     > Just skip to `Step 3 (Name, review, and create)` and hit the `Create Role` button. We'll edit and add premissions later
+    {{< callout type="note" title="Note" >}}
+No need to add permissions in the first setup.
+     Just skip to `Step 3 (Name, review, and create)` and hit the `Create Role` button. We'll edit and add premissions later.
+    {{< /callout >}}
 
      ![IAM Role](/images/temporal-ecs-terraform/iam_role.png "'IAM Role'")
 
@@ -1143,13 +1142,13 @@ You can start with this broad policy:
 }
 ```
 
-> [!CAUTION]
->
-> Make sure to replace the `<S3_REMOTE_BACKEND_BUCKET_NAME>` placeholder, at the bottom, with the name of the remote S3 backend bucket you created during the bootstrap process. 
+{{< callout type="warning" title="Warning" >}}
+Make sure to replace the `<S3_REMOTE_BACKEND_BUCKET_NAME>` placeholder, at the bottom, with the name of the remote S3 backend bucket you created during the bootstrap process. 
+{{< /callout >}}
 
-> [!WARNING]
->
-> Later adjust it for your own use case and follow the principle of least privilege for production use.
+{{< callout type="warning" title="Warning" >}}
+Later adjust it for your own use case and follow the principle of least privilege for production use.
+{{< /callout >}}
 
 ![Permissions](/images/temporal-ecs-terraform/permissions.png "'Permissions'")
 
@@ -1157,12 +1156,12 @@ We can now finally, create a policy by giving it a name (e.g. `temporal-ecs-terr
 
 ![Create Policy](/images/temporal-ecs-terraform/create_policy.png)
 
-> [!NOTE]
->
-> After creating the role, copy its ARN as we will store it soon as a GitHub repository secret (e.g., `AWS_GITHUB_ACTIONS_ROLE_ARN`).
->
-> ![IAM Role ARN](/images/temporal-ecs-terraform/role_arn.png)
+{{< callout type="note" title="Note" >}}
 
+After creating the role, copy its ARN as we will store it soon as a GitHub repository secret (e.g., `AWS_GITHUB_ACTIONS_ROLE_ARN`).
+
+![IAM Role ARN](/images/temporal-ecs-terraform/role_arn.png)
+{{< /callout >}}
 
 
 #### iii. 🛠️ GitHub Secrets Setup and Variables
@@ -1183,9 +1182,9 @@ This step ensures your GitHub Actions pipeline can authenticate with AWS, fetch 
 
   - `AWS_GITHUB_ACTIONS_ROLE_ARN` - The ARN of the IAM you recently created in the OIDC setup.
 
-    > [!TIP]
-    >
-    > Keep the secret name exactly as written — it will be referenced by your GitHub Actions workflow later for assuming the AWS IAM role.
+    {{< callout type="tip" title="Tip" >}}
+    Keep the secret name exactly as written — it will be referenced by your GitHub Actions workflow later for assuming the AWS IAM role.
+    {{< /callout >}}
 
 ✅ **Result:**
 
@@ -1209,10 +1208,9 @@ Navigate to:
 
   As an additional layer of customization, let’s define a few **GitHub environment variables** for our `dev` setup.
   
-  > [!TIP]
-  >
-  > Environment variables are scoped per environment. This helps later when you extend to multiple environments (e.g., `staging` or `production`) using the same workflow file.
-
+  {{< callout type="tip" title="Tip" >}}
+  Environment variables are scoped per environment. This helps later when you extend to multiple environments (e.g., `staging` or `production`) using the same workflow file.
+  {{< /callout >}}
 
 For now, let’s create variables for the name of your S3 bucket and ECR repository under the `dev` environment:
 
@@ -1236,9 +1234,9 @@ Your GitHub repository is now fully configured with the secrets and variables re
 In the next step, we’ll activate the **GitHub Actions workflows** defined in the [repository](https://github.com/papnori/temporal-ecs-terraform) —
 `build-and-publish-ecr-dev.yaml` and `terraform-live-dev-deploy.yaml` — which tie everything together by automating Docker builds, ECR pushes, and Terraform deployments. 🚀
 
-> [!TIP]
->
-> You can even store environment variables and application secrets in GitHub and skip the Step 1, above, where we use AWS Secrets Manager to store Temporal secrets :wink:.
+{{< callout type="tip" title="Tip" >}}
+You can even store environment variables and application secrets in GitHub and skip the Step 1, above, where we use AWS Secrets Manager to store Temporal secrets :wink:.
+{{< /callout >}}
 
 ---
 
@@ -1269,12 +1267,13 @@ You can also build an updated image by triggering the `Build & Push to ECR (Dev)
 | **Build & Push to ECR (Dev)**🗄️🚀 | Builds your Temporal Worker image and pushes it to ECR |               On push to `main` or manual run                | Checkout → OIDC auth → Docker build → Push → Output image URI |
 |       **Deploy to Dev**🚀        |      Applies Terraform changes with the new image      | Triggered after successful build or on Terraform file changes | Terraform init → Plan → Apply → ECS service stability check  |
 
-> [!NOTE]
->
-> You can view the **full, production-ready workflow files** in the GitHub repository:
->
-> - [`build-and-publish-ecr-dev.yaml`](https://github.com/papnori/temporal-ecs-terraform/blob/main/.github/workflows/build-and-publish-ecr-dev.yaml)
-> - [`terraform-live-dev-deploy.yaml`](https://github.com/papnori/temporal-ecs-terraform/blob/main/.github/workflows/terraform-live-dev-deploy.yaml)
+{{< callout type="note" title="Note" >}}
+
+You can view the **full, production-ready workflow files** in the GitHub repository:
+
+- [`build-and-publish-ecr-dev.yaml`](https://github.com/papnori/temporal-ecs-terraform/blob/main/.github/workflows/build-and-publish-ecr-dev.yaml)
+- [`terraform-live-dev-deploy.yaml`](https://github.com/papnori/temporal-ecs-terraform/blob/main/.github/workflows/terraform-live-dev-deploy.yaml)
+{{< /callout >}}
 
 ✅ **Result:**
 Your CI/CD pipeline is now fully automated — pushing code to `main` builds and deploys new workers to ECS.
@@ -1356,14 +1355,14 @@ Tuning knobs:
 
 🔮 In the future, you can also monitor the Temporal Cloud pipeline and scale based on workflow queue depth or task backlog.
 
-> [!TIP]
->
-> The type of scaling policy we’ve used here is a **[Step Scaling Policy](https://docs.aws.amazon.com/autoscaling/application/userguide/application-auto-scaling-step-scaling-policies.html)** — where scaling happens in *defined steps* based on metric thresholds.
->
-> AWS also offers other policy types worth exploring:
->
-> - **[Target Tracking Scaling Policy](https://docs.aws.amazon.com/autoscaling/application/userguide/application-auto-scaling-target-tracking.html)** — automatically adjusts task count to maintain a target metric (like 50% CPU).
-> - [**Predictive Scaling Policy**](https://docs.aws.amazon.com/autoscaling/application/userguide/application-auto-scaling-predictive-scaling.html) — uses historical data to forecast demand and scale ahead of time.
+{{< callout type="tip" title="Tip" >}}
+The type of scaling policy we’ve used here is a **[Step Scaling Policy](https://docs.aws.amazon.com/autoscaling/application/userguide/application-auto-scaling-step-scaling-policies.html)** — where scaling happens in *defined steps* based on metric thresholds.
+
+AWS also offers other policy types worth exploring:
+
+- **[Target Tracking Scaling Policy](https://docs.aws.amazon.com/autoscaling/application/userguide/application-auto-scaling-target-tracking.html)** — automatically adjusts task count to maintain a target metric (like 50% CPU).
+- [**Predictive Scaling Policy**](https://docs.aws.amazon.com/autoscaling/application/userguide/application-auto-scaling-predictive-scaling.html) — uses historical data to forecast demand and scale ahead of time.
+{{< /callout >}}
 
 ## 💥☢️ Destroy the infrastructure
 
