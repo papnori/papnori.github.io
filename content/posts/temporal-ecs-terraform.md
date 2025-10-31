@@ -1115,7 +1115,7 @@ You can start with this broad policy:
 			"Resource": [
 				"arn:aws:s3:::<S3_REMOTE_BACKEND_BUCKET_NAME>",
 				"arn:aws:s3:::<S3_REMOTE_BACKEND_BUCKET_NAME>/*",
-				"arn:aws:ecr:us-east-1:583700610388:repository/temporal-worker-dev"
+				"arn:aws:ecr:us-east-1:012345678912:repository/temporal-worker-dev"
 			]
 		}
 	]
