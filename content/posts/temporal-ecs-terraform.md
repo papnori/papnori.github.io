@@ -504,7 +504,7 @@ Next, we’ll create the **S3 bucket** that will hold the remote Terraform state
 **✅ Result:**
 You now have a remote S3 bucket ( in this demo: `my-little-sample-terraform-state`) ready to hold your Terraform state.
 
-![S3 Bucket for State Files](/images/temporal-ecs-terraform/3_bucket.png)
+![S3 Bucket for State Files](/images/temporal-ecs-terraform/S3_bucket.png)
 
 The Terraform state file from this bootstrap run is still **local** (`terraform/bootstrap/terraform.tfstate`) — so don’t spill your coffee yet ☕💻 — but the bucket now exists for future remote state storage.
 

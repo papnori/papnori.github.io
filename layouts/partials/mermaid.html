@@ -1,0 +1,23 @@
+<!-- layouts/partials/mermaid.html -->
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // If theme wraps code blocks, convert them to mermaid containers
+    document.querySelectorAll('pre code.language-mermaid, pre code.mermaid').forEach(code => {
+      const parent = code.parentNode;
+      const container = document.createElement('div');
+      container.classList.add('mermaid');
+      container.textContent = code.textContent;
+      parent.parentNode.replaceChild(container, parent);
+    });
+
+    // Initialize mermaid on the page
+    if (window.mermaid) {
+      mermaid.initialize({ startOnLoad: true, theme: 'default' });
+      // For any dynamic containers added above
+      mermaid.init(undefined, document.querySelectorAll('.mermaid'));
+    } else {
+      console.error('mermaid not loaded');
+    }
+  });
+</script>
