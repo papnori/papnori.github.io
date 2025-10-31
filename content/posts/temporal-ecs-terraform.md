@@ -1235,7 +1235,7 @@ In the next step, we’ll activate the **GitHub Actions workflows** defined in t
 `build-and-publish-ecr-dev.yaml` and `terraform-live-dev-deploy.yaml` — which tie everything together by automating Docker builds, ECR pushes, and Terraform deployments. 🚀
 
 {{< callout type="tip" title="Tip" >}}
-You can even store environment variables and application secrets in GitHub and skip the Step 1, above, where we use AWS Secrets Manager to store Temporal secrets :wink:.
+You can even store environment variables and application secrets in GitHub and skip the Step 1, above, where we use AWS Secrets Manager to store Temporal secrets.
 {{< /callout >}}
 
 ---
