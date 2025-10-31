@@ -2,6 +2,7 @@
 title: "Deploying Temporal on AWS ECS with Terraform"
 date: 2025-10-07
 draft: false
+summary: "Skip the Kubernetes overhead—this guide shows how to run Temporal workers on ECS with Fargate, cutting costs while keeping your setup resilient and production-ready. 💪"
 ---
 
 ## 👋  Introduction
@@ -174,7 +175,7 @@ The **ECS cluster** is where your Temporal workers live and operate, running as 
 - Autoscaling is configured via **CloudWatch alarms on CPU usage**:
   - Scale-out policy *adds workers* when CPU > 30%. 
   - Scale-in policy *removes idle workers* when CPU < 20%.
-- This setup delivers a **secure, cost-efficient, self-managing and self-healing** worker fleet — no need for Kubernetes overhead and maybe even enough savings 💰 to keep you stocked with more instant ramen. 🍜 :wink:
+- This setup delivers a **secure, cost-efficient, self-managing and self-healing** worker fleet — no need for Kubernetes overhead and maybe even enough savings 💰 to keep you stocked with more instant ramen. 🍜 😉
 
 #### 💪 ECS Fargate — The Muscle
 **AWS Fargate** provides the compute power behind your ECS tasks — a **serverless, container-based infrastructure** that eliminates server management entirely.
@@ -343,7 +344,7 @@ If you’re new to Terraform, you might wonder: *why do we need a separate setup
 
 When you run Terraform, it generates a **state file** — basically a snapshot of everything Terraform has created and manages. That state file has to live somewhere safe. 
 
-Storing it only on your laptop is risky (imagine spilling coffee on it and suddenly losing all records of your infrastructure :upside_down_face: — not exactly the ideal way to setup your new startup ☕💻🔥).
+Storing it only on your laptop is risky (imagine spilling coffee on it and suddenly losing all records of your infrastructure 🙃 — not exactly the ideal way to setup your new startup ☕💻🔥).
 
 That’s why we store it in **Amazon S3** as a remote backend: durable, centralized, and accessible to your whole team.
 
@@ -549,7 +550,7 @@ Now that the S3 bucket exists, we can switch Terraform to use it as the **remote
      ...
    ```
 
-3. **Type `yes` to confirm.** Terraform will automatically **move your local bootstrap state into the S3 bucket** at: `terraform/bootstrap/terraform.tfstate`. :raised_hands:
+3. **Type `yes` to confirm.** Terraform will automatically **move your local bootstrap state into the S3 bucket** at: `terraform/bootstrap/terraform.tfstate`. 🙌
 
 ✅ **Result:**
 Your Terraform state is now safely stored in Amazon S3 at `terraform/bootstrap/terraform.tfstate`.
@@ -628,7 +629,7 @@ Terraform will:
    
 - Create an **ECR repository** named `temporal-worker-dev` in the `us-east-1` region.
 
-- Attach a **lifecycle policy** that automatically deletes old images, keeping only the most recent five (again helping us save some money for ramen :ramen: :wink: )
+- Attach a **lifecycle policy** that automatically deletes old images, keeping only the most recent five (again helping us save some money for ramen 🍜 😉 )
 
 - Output the **repository URL** — which you’ll use to push Docker images or reference in CI/CD pipelines.
 
@@ -1366,7 +1367,7 @@ AWS also offers other policy types worth exploring:
 
 ## 💥☢️ Destroy the infrastructure
 
-Alright — we’ve built, deployed, scaled, and automated like champs. But unless you *really* want to sponsor Jeff Bezos’ next rocket launch, it’s time to **tear it all down** :sweat_smile:.
+Alright — we’ve built, deployed, scaled, and automated like champs. But unless you *really* want to sponsor Jeff Bezos’ next rocket launch, it’s time to **tear it all down** 😅.
 
 Let’s go step-by-step — in reverse order:
 
