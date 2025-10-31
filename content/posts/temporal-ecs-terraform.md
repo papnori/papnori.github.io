@@ -1183,7 +1183,7 @@ This step ensures your GitHub Actions pipeline can authenticate with AWS, fetch 
   - `AWS_GITHUB_ACTIONS_ROLE_ARN` - The ARN of the IAM you recently created in the OIDC setup.
 
     {{< callout type="tip" title="Tip" >}}
-    Keep the secret name exactly as written — it will be referenced by your GitHub Actions workflow later for assuming the AWS IAM role.
+  Keep the secret name exactly as written — it will be referenced by your GitHub Actions workflow later for assuming the AWS IAM role.
     {{< /callout >}}
 
 ✅ **Result:**
