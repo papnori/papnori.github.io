@@ -13,8 +13,11 @@
       <link>http://localhost:1313/posts/temporal-ecs-terraform/</link>
       <pubDate>Tue, 07 Oct 2025 00:00:00 +0000</pubDate>
       <guid>http://localhost:1313/posts/temporal-ecs-terraform/</guid>
-      <description>&lt;p&gt;Hello world! 👋&lt;/p&gt;
-&lt;p&gt;Stay tuned! 🌸&lt;/p&gt;</description>
+      <description>&lt;h1 id=&#34;deploying-temporal-on-aws-ecs-with-terraform&#34;&gt;Deploying Temporal on AWS ECS with Terraform&lt;/h1&gt;
+&lt;h2 id=&#34;--introduction&#34;&gt;👋  Introduction&lt;/h2&gt;
+&lt;p&gt;Most of Temporal’s official &lt;a href=&#34;https://docs.temporal.io/production-deployment/worker-deployments/deploy-workers-to-aws-eks&#34;&gt;deployment guides&lt;/a&gt; focus on Kubernetes. While Kubernetes is powerful and battle-tested for large-scale workloads, it also comes with significant overhead — &lt;strong&gt;both financially&lt;/strong&gt; (AWS EKS clusters aren’t cheap 💸) and &lt;strong&gt;operationally&lt;/strong&gt; (node upgrades, cluster maintenance, networking complexity).&lt;/p&gt;
+&lt;p&gt;For many teams, especially when just getting started, that’s more than you actually need.&lt;/p&gt;
+&lt;p&gt;This guide walks through deploying Temporal workers on AWS ECS with Terraform. Using ECS (especially with Fargate) can &lt;strong&gt;reduce infrastructure costs by ~70%&lt;/strong&gt; while still &lt;strong&gt;providing elasticity, resilience, and production-ready reliability&lt;/strong&gt;. 💪&lt;/p&gt;</description>
     </item>
   </channel>
 </rss>
