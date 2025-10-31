@@ -223,28 +223,7 @@ Now that we’ve covered the components, let’s quickly walk through how data a
 5. **Results & Updates** → Workers send results and progress updates back to **Temporal Cloud** or a **Self-hosted Temporal Server**.
 6. **Monitoring & Scaling** → **CloudWatch** tracks performance metrics and automatically scales the number of workers based on load.
 
-```mermaid
-sequenceDiagram
-    participant Client
-    participant Temporal as Temporal (Cloud or Server)
-    participant Queue as Temporal Task Queue
-    participant Workers as ECS Fargate Workers
-    participant CloudWatch
-
-    Client->>Temporal: workflow.execute_workflow()
-    Temporal->>Queue: Enqueue tasks
-    loop long-poll
-        Workers->>Queue: Poll for task
-        Queue-->>Workers: Task payload
-    end
-    Workers-->>Temporal: Heartbeats / Progress
-    Workers->>Temporal: Activity results
-    CloudWatch->>CloudWatch: Observe CPU/Mem metrics
-    CloudWatch-->>Workers: Scale out/in via ECS App Auto-Scaling
-
-```
-
-
+![Sequence Diagram](/images/temporal-ecs-terraform/mermaid.png)
 
 ---
 
