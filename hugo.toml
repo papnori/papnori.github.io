@@ -26,4 +26,6 @@ theme = "PaperMod"
 favicon = "favicon.ico"
 
 googleAnalytics = "G-RVSW0Q1XD0"
-
+[services]
+  [services.googleAnalytics]
+    id = 'G-RVSW0Q1XD0'
