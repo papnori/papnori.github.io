@@ -1454,7 +1454,7 @@ This article was never meant to exist — until we started building [**Skinsight
 
 Because yes — you can optimize cloud costs *and* your skincare routine at the same time 😅💜
 
-If you're curious what else we can spin up for nearly nothing, follow us on [🧠 Skinsight](skinsight.me/blog/brain/deploying-temporal-on-aws-ecs-with-terraform) — where beauty meets brains (and budget). 💅💻💜
+If you're curious what else we can spin up for nearly nothing, follow us on [🧠 Skinsight](https://skinsight.me/blog/brain/deploying-temporal-on-aws-ecs-with-terraform) — where beauty meets brains (and budget). 💅💻💜
 
 ---
 
